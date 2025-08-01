@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user";
+import jobRoutes from "./routes/jobs";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api", userRoutes);
+app.use("/jobs", jobRoutes);
 
 const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
