@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "../generated/prisma";
+import bcrypt from "bcrypt";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -17,8 +18,10 @@ router.post("/register", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Email already registered" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
-      data: { name, email, password },
+      data: { name, email, password: hashedPassword },
     });
 
     return res
