@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "../generated/prisma";
-import bcrypt from "bcrypt";
+import bcrypt, { compare } from "bcrypt";
+import { login } from "../services/authService";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -19,7 +20,6 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await prisma.user.create({
       data: { name, email, password: hashedPassword },
     });
@@ -29,6 +29,21 @@ router.post("/register", async (req: Request, res: Response) => {
       .json({ id: user.id, name: user.name, email: user.email });
   } catch (err) {
     return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/login", async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password required" });
+  }
+
+  try {
+    const { token, user } = await login(email, password);
+    return res.json({ token, user });
+  } catch (err: any) {
+    return res.status(401).json({ error: err.message });
   }
 });
 
