@@ -2,6 +2,10 @@ import { Router, Request, Response } from "express";
 import { PrismaClient } from "../generated/prisma";
 import bcrypt, { compare } from "bcrypt";
 import { login } from "../services/authService";
+import {
+  authMiddleware,
+  AuthenticatedRequest,
+} from "../middlewares/authMiddleware";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -46,5 +50,20 @@ router.post("/login", async (req: Request, res: Response) => {
     return res.status(401).json({ error: err.message });
   }
 });
+
+router.get(
+  "/me",
+  authMiddleware,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { id: true, name: true, email: true },
+    });
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    return res.json(user);
+  }
+);
 
 export default router;
