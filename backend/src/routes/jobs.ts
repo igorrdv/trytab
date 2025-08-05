@@ -12,25 +12,58 @@ router.get("/", async (req: Request, res: Response) => {
   const { remote, type, companyId } = req.query;
 
   const filters: any = {};
-  if (remote !== undefined) {
-    filters.remote = remote === "true";
-  }
-
-  if (type) {
-    filters.type = String(type);
-  }
-
-  if (companyId) {
-    filters.companyId = String(companyId);
-  }
+  if (remote !== undefined) filters.remote = remote === "true";
+  if (type) filters.type = String(type);
+  if (companyId) filters.companyId = String(companyId);
 
   const jobs = await prisma.job.findMany({
-    include: { company: true },
+    where: filters,
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true,
+        },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
-  if (!jobs) return res.status(404).json({ error: "No jobs found" });
+
+  if (!jobs || jobs.length === 0)
+    return res.status(404).json({ error: "No jobs found" });
+
   res.json(jobs);
 });
+
+router.get(
+  "/my-jobs",
+  authMiddleware,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const companyId = req.userId!;
+
+    const jobs = await prisma.job.findMany({
+      where: { companyId },
+      include: {
+        company: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!jobs || jobs.length === 0)
+      return res.status(404).json({ error: "No jobs found" });
+
+    res.json(jobs);
+  }
+);
 
 router.get("/:id", async (req: Request, res: Response) => {
   const job = await prisma.job.findUnique({ where: { id: req.params.id } });
@@ -44,11 +77,31 @@ router.post(
   async (req: AuthenticatedRequest, res: Response) => {
     const { title, description, location, type, salary, remote } = req.body;
     const companyId = req.userId!;
+    const role = req.role;
 
-    const job = await prisma.job.create({
-      data: { title, description, location, type, salary, remote, companyId },
-    });
-    res.status(201).json(job);
+    if (role !== "company") {
+      return res
+        .status(403)
+        .json({ error: "Apenas empresas podem criar vagas." });
+    }
+
+    try {
+      const job = await prisma.job.create({
+        data: {
+          title,
+          description,
+          location,
+          type,
+          salary,
+          remote,
+          company: { connect: { id: companyId } },
+        },
+      });
+
+      res.status(201).json(job);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao criar a vaga." });
+    }
   }
 );
 
@@ -56,17 +109,17 @@ router.put(
   "/:id",
   authMiddleware,
   async (req: AuthenticatedRequest, res: Response) => {
-    const id = req.params.id;
-    const userId = req.userId!;
     const { title, description, location, type, salary, remote } = req.body;
+    const jobId = req.params.id;
+    const userId = req.userId!;
 
-    const job = await prisma.job.findUnique({ where: { id } });
+    const job = await prisma.job.findUnique({ where: { id: jobId } });
     if (!job) return res.status(404).json({ error: "Job not found" });
     if (job.companyId !== userId)
       return res.status(403).json({ error: "Forbidden" });
 
     const updatedJob = await prisma.job.update({
-      where: { id },
+      where: { id: jobId },
       data: { title, description, location, type, salary, remote },
     });
 
@@ -74,11 +127,22 @@ router.put(
   }
 );
 
-router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
-  await prisma.job.delete({
-    where: { id: req.params.id },
-  });
-  res.status(204).send();
-});
+router.delete(
+  "/:id",
+  authMiddleware,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const jobId = req.params.id;
+    const userId = req.userId!;
+
+    const job = await prisma.job.findUnique({ where: { id: jobId } });
+    if (!job) return res.status(404).json({ error: "Job not found" });
+    if (job.companyId !== userId)
+      return res.status(403).json({ error: "Forbidden" });
+
+    await prisma.job.delete({ where: { id: jobId } });
+
+    res.status(204).send();
+  }
+);
 
 export default router;

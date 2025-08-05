@@ -1019,6 +1019,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     createdAt: Date | null
+    role: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1027,6 +1028,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     createdAt: Date | null
+    role: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1035,6 +1037,7 @@ export namespace Prisma {
     email: number
     password: number
     createdAt: number
+    role: number
     _all: number
   }
 
@@ -1045,6 +1048,7 @@ export namespace Prisma {
     email?: true
     password?: true
     createdAt?: true
+    role?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1053,6 +1057,7 @@ export namespace Prisma {
     email?: true
     password?: true
     createdAt?: true
+    role?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1061,6 +1066,7 @@ export namespace Prisma {
     email?: true
     password?: true
     createdAt?: true
+    role?: true
     _all?: true
   }
 
@@ -1142,6 +1148,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt: Date
+    role: string
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1167,6 +1174,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     createdAt?: boolean
+    role?: boolean
     jobs?: boolean | User$jobsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1177,6 +1185,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     createdAt?: boolean
+    role?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1185,6 +1194,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     createdAt?: boolean
+    role?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1193,9 +1203,10 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     createdAt?: boolean
+    role?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "createdAt" | "role", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobs?: boolean | User$jobsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1214,6 +1225,7 @@ export namespace Prisma {
       email: string
       password: string
       createdAt: Date
+      role: string
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1643,6 +1655,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
+    readonly role: FieldRef<"User", 'String'>
   }
     
 
@@ -3215,7 +3228,8 @@ export namespace Prisma {
     name: 'name',
     email: 'email',
     password: 'password',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    role: 'role'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3327,6 +3341,7 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
+    role?: StringFilter<"User"> | string
     jobs?: JobListRelationFilter
   }
 
@@ -3336,6 +3351,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     createdAt?: SortOrder
+    role?: SortOrder
     jobs?: JobOrderByRelationAggregateInput
   }
 
@@ -3348,6 +3364,7 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
+    role?: StringFilter<"User"> | string
     jobs?: JobListRelationFilter
   }, "id" | "email">
 
@@ -3357,6 +3374,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     createdAt?: SortOrder
+    role?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -3371,6 +3389,7 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     password?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    role?: StringWithAggregatesFilter<"User"> | string
   }
 
   export type JobWhereInput = {
@@ -3459,6 +3478,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt?: Date | string
+    role?: string
     jobs?: JobCreateNestedManyWithoutCompanyInput
   }
 
@@ -3468,6 +3488,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt?: Date | string
+    role?: string
     jobs?: JobUncheckedCreateNestedManyWithoutCompanyInput
   }
 
@@ -3477,6 +3498,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
     jobs?: JobUpdateManyWithoutCompanyNestedInput
   }
 
@@ -3486,6 +3508,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
     jobs?: JobUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
@@ -3495,6 +3518,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt?: Date | string
+    role?: string
   }
 
   export type UserUpdateManyMutationInput = {
@@ -3503,6 +3527,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3511,6 +3536,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
   }
 
   export type JobCreateInput = {
@@ -3523,7 +3549,7 @@ export namespace Prisma {
     remote?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    company?: UserCreateNestedOneWithoutJobsInput
+    company: UserCreateNestedOneWithoutJobsInput
   }
 
   export type JobUncheckedCreateInput = {
@@ -3534,7 +3560,7 @@ export namespace Prisma {
     type?: string
     salary?: string | null
     remote?: boolean
-    companyId?: string
+    companyId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -3573,7 +3599,7 @@ export namespace Prisma {
     type?: string
     salary?: string | null
     remote?: boolean
-    companyId?: string
+    companyId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -3645,6 +3671,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     createdAt?: SortOrder
+    role?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -3653,6 +3680,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     createdAt?: SortOrder
+    role?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -3661,6 +3689,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     createdAt?: SortOrder
+    role?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -4056,6 +4085,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt?: Date | string
+    role?: string
   }
 
   export type UserUncheckedCreateWithoutJobsInput = {
@@ -4064,6 +4094,7 @@ export namespace Prisma {
     email: string
     password: string
     createdAt?: Date | string
+    role?: string
   }
 
   export type UserCreateOrConnectWithoutJobsInput = {
@@ -4088,6 +4119,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateWithoutJobsInput = {
@@ -4096,6 +4128,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: StringFieldUpdateOperationsInput | string
   }
 
   export type JobCreateManyCompanyInput = {

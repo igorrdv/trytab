@@ -15,6 +15,7 @@ model User {
   password  String
   createdAt DateTime @default(now())
   jobs      Job[]    @relation("CompanyJobs")
+  role      String   @default("user")
 }
 
 model Job {
@@ -25,7 +26,7 @@ model Job {
   type        String   @default("full-time")
   salary      String?
   remote      Boolean  @default(false)
-  companyId   String   @default("")
+  companyId   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   company     User     @relation("CompanyJobs", fields: [companyId], references: [id])
