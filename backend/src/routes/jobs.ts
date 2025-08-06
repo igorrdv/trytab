@@ -80,9 +80,7 @@ router.post(
     const role = req.role;
 
     if (role !== "company") {
-      return res
-        .status(403)
-        .json({ error: "Apenas empresas podem criar vagas." });
+      return res.status(403).json({ error: "Only companies can create jobs." });
     }
 
     try {
@@ -100,7 +98,7 @@ router.post(
 
       res.status(201).json(job);
     } catch (error) {
-      res.status(500).json({ error: "Erro ao criar a vaga." });
+      res.status(500).json({ error: "Error creating job." });
     }
   }
 );

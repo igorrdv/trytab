@@ -9,25 +9,39 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  jobs      Job[]    @relation("CompanyJobs")
-  role      String   @default("user")
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  jobs         Job[]         @relation("CompanyJobs")
+  role         String        @default("user")
+  applications Application[]
 }
 
 model Job {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  location    String
-  type        String   @default("full-time")
-  salary      String?
-  remote      Boolean  @default(false)
-  companyId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  company     User     @relation("CompanyJobs", fields: [companyId], references: [id])
+  id           String        @id @default(cuid())
+  title        String
+  description  String
+  location     String
+  type         String        @default("full-time")
+  salary       String?
+  remote       Boolean       @default(false)
+  companyId    String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  company      User          @relation("CompanyJobs", fields: [companyId], references: [id])
+  applications Application[]
+}
+
+model Application {
+  id        String   @id @default(uuid())
+  userId    String
+  jobId     String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  job       Job      @relation(fields: [jobId], references: [id])
+
+  @@unique([userId, jobId])
 }

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/user";
 import jobRoutes from "./routes/jobs";
 import authRoutes from "./routes/authRoutes";
+import applicationRoutes from "./routes/applications";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/applications", applicationRoutes);
 
 const PORT = process.env.PORT || 3333;
 app.listen(PORT, () => {
