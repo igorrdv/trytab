@@ -5,7 +5,8 @@ const JWT_SECRET = process.env.JWT_SECRET as Secret;
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
-  role?: string;
+  companyId?: string;
+  role?: "user" | "company";
 }
 
 export function authMiddleware(
@@ -24,7 +25,7 @@ export function authMiddleware(
       role: string;
     };
     req.userId = decoded.userId;
-    req.role = decoded.role;
+    req.role = decoded.role as "user" | "company";
     next();
   } catch {
     return res.status(401).json({ error: "Invalid token" });
