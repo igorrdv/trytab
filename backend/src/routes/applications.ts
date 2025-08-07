@@ -4,6 +4,7 @@ import {
   AuthenticatedRequest,
   authMiddleware,
 } from "../middlewares/authMiddleware";
+import { error } from "console";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -67,5 +68,35 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch applications" });
   }
 });
+router.delete(
+  "/:jobId",
+  authMiddleware,
+  async (req: Request, res: Response) => {
+    const { jobId } = req.params;
+    const userId = (req as AuthenticatedRequest).userId!;
+
+    try {
+      const existingApplication = await prisma.application.findUnique({
+        where: {
+          userId_jobId: { userId, jobId },
+        },
+      });
+
+      if (!existingApplication) {
+        return res.status(404).json({ error: "Application not found" });
+      }
+
+      await prisma.application.delete({
+        where: {
+          userId_jobId: { userId, jobId },
+        },
+      });
+
+      res.status(200).json({ message: "Application cancelled successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel application" });
+    }
+  }
+);
 
 export default router;
