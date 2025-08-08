@@ -82,14 +82,16 @@ router.delete(
     const userId = (req as AuthenticatedRequest).userId!;
 
     try {
-      const existingApplication = await prisma.application.findUnique({
-        where: {
-          userId_jobId: { userId, jobId },
-        },
+      const existingApplication = await prisma.application.findFirst({
+        where: { jobId },
       });
 
       if (!existingApplication) {
         return res.status(404).json({ error: "Application not found" });
+      }
+
+      if (existingApplication.userId !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
       }
 
       await prisma.application.delete({
@@ -104,7 +106,6 @@ router.delete(
     }
   }
 );
-
 router.get(
   "/:jobId/applications",
   authMiddleware,
