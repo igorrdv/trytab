@@ -4,6 +4,8 @@ import {
   authMiddleware,
   AuthenticatedRequest,
 } from "../middlewares/authMiddleware";
+import { validate } from "../middlewares/validate";
+import { createJobSchema } from "../schemas/jobSchema";
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -74,6 +76,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 router.post(
   "/",
   authMiddleware,
+  validate(createJobSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     const { title, description, location, type, salary, remote } = req.body;
     const companyId = req.userId!;
