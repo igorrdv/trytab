@@ -1,0 +1,377 @@
+openapi: 3.0.0
+info:
+  title: TryTab API
+  version: 1.0.0
+  description: API for job platform with authentication, company management, and job postings.
+
+servers:
+  - url: http://localhost:3333
+    description: Local development server
+
+paths:
+  /jobs:
+    get:
+      summary: List all jobs with optional filters
+      tags:
+        - Jobs
+      parameters:
+        - name: remote
+          in: query
+          schema:
+            type: boolean
+          description: Filter by remote jobs (true or false)
+        - name: type
+          in: query
+          schema:
+            type: string
+          description: Filter by job type
+        - name: companyId
+          in: query
+          schema:
+            type: string
+          description: Filter by company ID
+      responses:
+        "200":
+          description: List of jobs
+          content:
+            application/json:
+              example:
+                - id: "job123"
+                  title: "Software Engineer"
+                  description: "Develop software solutions"
+                  location: "Remote"
+                  type: "Full-time"
+                  salary: 8000
+                  remote: true
+                  company:
+                    id: "company123"
+                    name: "Tech Corp"
+                    email: "hr@techcorp.com"
+                    createdAt: "2025-01-01T12:00:00Z"
+                - id: "job124"
+                  title: "Data Analyst"
+                  description: "Analyze data"
+                  location: "New York"
+                  type: "Part-time"
+                  salary: 4000
+                  remote: false
+                  company:
+                    id: "company124"
+                    name: "Data Inc"
+                    email: "contact@datainc.com"
+                    createdAt: "2024-12-15T08:30:00Z"
+        "404":
+          description: No jobs found
+          content:
+            application/json:
+              example:
+                error: "No jobs found"
+
+    post:
+      summary: Create a new job
+      tags:
+        - Jobs
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Job data
+        required: true
+        content:
+          application/json:
+            example:
+              title: "Software Engineer"
+              description: "Develop software solutions"
+              location: "Remote"
+              type: "Full-time"
+              salary: 8000
+              remote: true
+      responses:
+        "201":
+          description: Job created
+          content:
+            application/json:
+              example:
+                id: "job123"
+                title: "Software Engineer"
+                description: "Develop software solutions"
+                location: "Remote"
+                type: "Full-time"
+                salary: 8000
+                remote: true
+                companyId: "company123"
+        "403":
+          description: Only companies can create jobs
+          content:
+            application/json:
+              example:
+                error: "Only companies can create jobs."
+        "500":
+          description: Server error
+          content:
+            application/json:
+              example:
+                error: "Error creating job."
+
+  /jobs/my-jobs:
+    get:
+      summary: List jobs created by authenticated company
+      tags:
+        - Jobs
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of jobs for the company
+          content:
+            application/json:
+              example:
+                - id: "job125"
+                  title: "Project Manager"
+                  description: "Manage projects"
+                  location: "San Francisco"
+                  type: "Full-time"
+                  salary: 9000
+                  remote: false
+                  company:
+                    id: "company123"
+                    name: "Tech Corp"
+                    email: "hr@techcorp.com"
+                    createdAt: "2025-01-01T12:00:00Z"
+        "404":
+          description: No jobs found
+          content:
+            application/json:
+              example:
+                error: "No jobs found"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+
+  /jobs/{id}:
+    get:
+      summary: Get a job by ID
+      tags:
+        - Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job details
+          content:
+            application/json:
+              example:
+                id: "job123"
+                title: "Software Engineer"
+                description: "Develop software solutions"
+                location: "Remote"
+                type: "Full-time"
+                salary: 8000
+                remote: true
+                companyId: "company123"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              example:
+                error: "Job not found"
+
+    put:
+      summary: Update a job by ID
+      tags:
+        - Jobs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Fields to update
+        required: true
+        content:
+          application/json:
+            example:
+              title: "Senior Software Engineer"
+              description: "Lead software development"
+              location: "Remote"
+              type: "Full-time"
+              salary: 10000
+              remote: true
+      responses:
+        "200":
+          description: Updated job
+          content:
+            application/json:
+              example:
+                id: "job123"
+                title: "Senior Software Engineer"
+                description: "Lead software development"
+                location: "Remote"
+                type: "Full-time"
+                salary: 10000
+                remote: true
+                companyId: "company123"
+        "403":
+          description: Forbidden (not owner)
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              example:
+                error: "Job not found"
+
+    delete:
+      summary: Delete a job by ID
+      tags:
+        - Jobs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Job deleted successfully (no content)
+        "403":
+          description: Forbidden (not owner)
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              example:
+                error: "Job not found"
+
+  /register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        description: User registration data
+        required: true
+        content:
+          application/json:
+            example:
+              name: "John Doe"
+              email: "john@example.com"
+              password: "password123"
+              role: "candidate"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              example:
+                id: "user123"
+                name: "John Doe"
+                email: "john@example.com"
+        "400":
+          description: Missing fields or email already registered
+          content:
+            application/json:
+              examples:
+                missingFields:
+                  summary: Missing required fields
+                  value: { error: "All fields are required." }
+                emailExists:
+                  summary: Email already registered
+                  value: { error: "Email already registered" }
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                error: "Internal server error"
+
+  /login:
+    post:
+      summary: Login a user
+      tags:
+        - Users
+      requestBody:
+        description: User login data
+        required: true
+        content:
+          application/json:
+            example:
+              email: "john@example.com"
+              password: "password123"
+      responses:
+        "200":
+          description: Successful login with token and user info
+          content:
+            application/json:
+              example:
+                token: "jwt.token.here"
+                user:
+                  id: "user123"
+                  name: "John Doe"
+                  email: "john@example.com"
+        "400":
+          description: Missing email or password
+          content:
+            application/json:
+              example:
+                error: "Email and password required"
+        "401":
+          description: Unauthorized - invalid credentials
+          content:
+            application/json:
+              example:
+                error: "Invalid email or password"
+
+  /me:
+    get:
+      summary: Get authenticated user's profile
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Authenticated user data
+          content:
+            application/json:
+              example:
+                id: "user123"
+                name: "John Doe"
+                email: "john@example.com"
+        "401":
+          description: Unauthorized - no or invalid token
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              example:
+                error: "User not found"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

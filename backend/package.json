@@ -21,6 +21,9 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "prisma": "^6.13.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0",
     "zod": "^4.0.17"
   },
   "devDependencies": {
@@ -31,6 +34,9 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.1.0",
     "@types/supertest": "^6.0.3",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/yamljs": "^0.2.34",
     "cross-env": "^10.0.0",
     "jest": "^30.0.5",
     "supertest": "^7.1.4",

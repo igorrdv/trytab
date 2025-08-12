@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 router.post(
   "/:jobId",
   authMiddleware,
-
+  validateCreateApplication,
   async (req: Request, res: Response) => {
     const { jobId } = req.params;
     const { userId, role } = req as AuthenticatedRequest;
