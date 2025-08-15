@@ -6,7 +6,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const jobsRes = await api.get("/jobs");
+      const jobsRes = await api.get("/api/jobs");
       const appsRes = await api.get("/applications");
       setStats({
         jobsCount: jobsRes.data.length,
