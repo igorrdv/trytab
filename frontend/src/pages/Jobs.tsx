@@ -1,28 +1,76 @@
-import { useEffect, useState } from "react";
-import api from "../services/api";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface Job {
+  id: number;
+  title: string;
+  description: string;
+  location: string;
+  remote: boolean;
+}
 
 export default function Jobs() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      const res = await api.get("/jobs");
-      setJobs(res.data);
-    };
-    fetchJobs();
-  }, []);
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    fetch("http://localhost:3333/jobs", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao buscar jobs");
+        return res.json();
+      })
+      .then((data) => {
+        setJobs(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        localStorage.removeItem("token");
+        navigate("/login");
+      })
+      .finally(() => setLoading(false));
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Carregando...
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Vagas</h1>
-      <ul className="space-y-2">
-        {jobs.map((job) => (
-          <li key={job.id} className="border p-3 rounded">
-            <h2 className="font-semibold">{job.title}</h2>
-            <p>{job.description}</p>
-          </li>
-        ))}
-      </ul>
+    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow rounded">
+      <h1 className="text-2xl font-bold mb-6">Vagas disponíveis</h1>
+      {jobs.length === 0 ? (
+        <p>Nenhuma vaga encontrada.</p>
+      ) : (
+        <ul className="space-y-4">
+          {jobs.map((job) => (
+            <li
+              key={job.id}
+              className="p-4 border rounded shadow-sm hover:shadow-md transition"
+            >
+              <h2 className="text-xl font-semibold">{job.title}</h2>
+              <p className="text-gray-700">{job.description}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Local: {job.location} {job.remote && "(remote)"}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
