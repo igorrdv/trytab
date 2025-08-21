@@ -8,11 +8,14 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
+    role: "user",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -72,6 +75,16 @@ export default function Register() {
           required
           className="border border-gray-300 p-2 rounded w-full mb-4"
         />
+
+        <select
+          name="role"
+          value={form.role}
+          onChange={handleChange}
+          className="border border-gray-300 p-2 rounded w-full mb-4"
+        >
+          <option value="user">Candidate</option>
+          <option value="company">Company</option>
+        </select>
 
         <button
           type="submit"
