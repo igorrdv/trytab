@@ -9,6 +9,7 @@ export default function Register() {
     email: "",
     password: "",
     role: "user",
+    companyName: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +27,7 @@ export default function Register() {
 
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/api/register`, form);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.error || "Registration failed");
     } finally {
@@ -82,9 +83,21 @@ export default function Register() {
           onChange={handleChange}
           className="border border-gray-300 p-2 rounded w-full mb-4"
         >
-          <option value="user">Candidate</option>
+          <option value="user">User</option>
           <option value="company">Company</option>
         </select>
+
+        {form.role === "company" && (
+          <input
+            type="text"
+            name="companyName"
+            placeholder="Company Name"
+            value={form.companyName}
+            onChange={handleChange}
+            required
+            className="border border-gray-300 p-2 rounded w-full mb-4"
+          />
+        )}
 
         <button
           type="submit"
