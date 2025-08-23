@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard";
 import Jobs from "../pages/Jobs";
 import Applications from "../pages/Applications";
 import { PrivateRoute } from "../components/PrivateRoute";
+import Profile from "../pages/Profile";
 
 const AppRoutes = () => {
   const token = localStorage.getItem("token");
@@ -46,6 +47,7 @@ const AppRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
