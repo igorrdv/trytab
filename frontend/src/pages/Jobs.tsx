@@ -54,9 +54,9 @@ export default function Jobs() {
                 className="p-4 border rounded shadow-sm hover:shadow-md transition"
               >
                 <h2 className="text-xl font-semibold">{job.title}</h2>
-                <p className="text-gray-700">{job.description}</p>
+                <p className="text-gray-700 line-clamp-2">{job.description}</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Local: {job.location} {job.remote && "(remote)"}
+                  Local: {job.location} {job.remote && "(Remoto)"}
                 </p>
 
                 <Link
