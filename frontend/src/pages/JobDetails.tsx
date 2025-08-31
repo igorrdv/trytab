@@ -15,15 +15,14 @@ export default function JobDetails() {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     fetch(`http://localhost:3333/jobs/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("Erro ao buscar vaga");
@@ -36,12 +35,16 @@ export default function JobDetails() {
 
   async function handleApply() {
     if (!job) return;
+    setApplying(true);
+    setMessage(null);
 
     try {
-      const res = await applyToJob(job.id);
+      await applyToJob(job.id);
       setMessage("✅ Candidatura realizada com sucesso!");
     } catch (err: any) {
-      setMessage("❌ " + err.message);
+      setMessage("❌ " + (err.response?.data?.error || err.message));
+    } finally {
+      setApplying(false);
     }
   }
 
@@ -73,9 +76,14 @@ export default function JobDetails() {
 
         <button
           onClick={handleApply}
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          disabled={applying}
+          className={`px-6 py-2 text-white rounded transition ${
+            applying
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+          }`}
         >
-          Candidatar-se
+          {applying ? "Candidatando..." : "Candidatar-se"}
         </button>
 
         {message && <p className="mt-4 text-center text-sm">{message}</p>}
