@@ -18,6 +18,9 @@ export default function Jobs() {
   const [locationFilter, setLocationFilter] = useState("");
   const [remoteOnly, setRemoteOnly] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 4;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -65,6 +68,16 @@ export default function Jobs() {
     return matchesSearch && matchesLocation && matchesRemote;
   });
 
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const startIndex = (currentPage - 1) * jobsPerPage;
+  const currentJobs = filteredJobs.slice(startIndex, startIndex + jobsPerPage);
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -101,23 +114,47 @@ export default function Jobs() {
         {filteredJobs.length === 0 ? (
           <p className="text-gray-500">Nenhuma vaga encontrada.</p>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {filteredJobs.map((job) => (
-              <a
-                key={job.id}
-                href={`/jobs/${job.id}`}
-                className="p-6 bg-white rounded shadow hover:shadow-lg transition"
+          <>
+            <div className="grid md:grid-cols-2 gap-6">
+              {currentJobs.map((job) => (
+                <a
+                  key={job.id}
+                  href={`/jobs/${job.id}`}
+                  className="p-6 bg-white rounded shadow hover:shadow-lg transition"
+                >
+                  <h2 className="text-xl font-semibold mb-2">{job.title}</h2>
+                  <p className="text-gray-700 mb-2 line-clamp-2">
+                    {job.description}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Local: {job.location} {job.remote && "(remote)"}
+                  </p>
+                </a>
+              ))}
+            </div>
+
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
               >
-                <h2 className="text-xl font-semibold mb-2">{job.title}</h2>
-                <p className="text-gray-700 mb-2 line-clamp-2">
-                  {job.description}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Local: {job.location} {job.remote && "(remote)"}
-                </p>
-              </a>
-            ))}
-          </div>
+                Anterior
+              </button>
+
+              <span>
+                Página {currentPage} de {totalPages}
+              </span>
+
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+              >
+                Próxima
+              </button>
+            </div>
+          </>
         )}
       </div>
     </>
