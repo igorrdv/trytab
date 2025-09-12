@@ -108,6 +108,12 @@ export default function CompanyJobs() {
                   >
                     Excluir
                   </button>
+                  <Link
+                    to={`/company/jobs/${job.id}/applications`}
+                    className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
+                  >
+                    Ver candidaturas
+                  </Link>
                 </div>
               </li>
             ))}
