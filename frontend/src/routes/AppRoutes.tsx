@@ -13,6 +13,7 @@ import { PrivateRoute } from "../components/PrivateRoute";
 import Profile from "../pages/Profile";
 import JobDetails from "../pages/JobDetails";
 import MyApplications from "../pages/MyApplications";
+import EditProfile from "../pages/EditProfile";
 
 const AppRoutes = () => {
   const token = localStorage.getItem("token");
@@ -53,6 +54,14 @@ const AppRoutes = () => {
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/my-applications" element={<MyApplications />} />
       </Routes>
+      <Route
+        path="/edit-profile"
+        element={
+          <PrivateRoute>
+            <EditProfile />
+          </PrivateRoute>
+        }
+      />
     </Router>
   );
 };
