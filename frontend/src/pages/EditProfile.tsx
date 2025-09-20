@@ -2,56 +2,88 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "company";
+  companyName?: string;
+}
+
 export default function EditProfile() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     companyName: "",
   });
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) return;
+
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(res.data);
+
+        const data: User = res.data;
+        setUser(data);
+
         setForm({
-          name: res.data.name || "",
-          email: res.data.email || "",
+          name: data.name || "",
+          email: data.email || "",
           password: "",
-          companyName: res.data.companyName || "",
+          companyName: data.companyName || "",
         });
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching user:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     try {
+      setSaving(true);
       const token = localStorage.getItem("token");
+      if (!token) return;
+
+      // só envia password se preenchido
+      const payload = {
+        name: form.name,
+        email: form.email,
+        ...(form.password ? { password: form.password } : {}),
+        ...(user.role === "company" ? { companyName: form.companyName } : {}),
+      };
+
       await axios.put(
         `${import.meta.env.VITE_API_URL}/api/users/${user.id}`,
-        form,
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       navigate("/profile");
     } catch (err) {
-      console.error(err);
+      console.error("Error updating profile:", err);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -60,6 +92,7 @@ export default function EditProfile() {
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-lg p-6">
       <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-medium">Name</label>
@@ -69,6 +102,7 @@ export default function EditProfile() {
             value={form.name}
             onChange={handleChange}
             className="w-full border p-2 rounded"
+            required
           />
         </div>
 
@@ -80,6 +114,7 @@ export default function EditProfile() {
             value={form.email}
             onChange={handleChange}
             className="w-full border p-2 rounded"
+            required
           />
         </div>
 
@@ -94,7 +129,7 @@ export default function EditProfile() {
           />
         </div>
 
-        {user.role === "company" && (
+        {user?.role === "company" && (
           <div>
             <label className="block font-medium">Company Name</label>
             <input
@@ -109,9 +144,14 @@ export default function EditProfile() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          disabled={saving}
+          className={`w-full p-2 rounded text-white ${
+            saving
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          Save Changes
+          {saving ? "Saving..." : "Save Changes"}
         </button>
       </form>
     </div>
