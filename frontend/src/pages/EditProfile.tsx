@@ -8,6 +8,7 @@ interface User {
   email: string;
   role: "user" | "company";
   companyName?: string;
+  avatarUrl?: string;
 }
 
 export default function EditProfile() {
@@ -20,6 +21,8 @@ export default function EditProfile() {
     password: "",
     companyName: "",
   });
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -42,6 +45,7 @@ export default function EditProfile() {
           password: "",
           companyName: data.companyName || "",
         });
+        setPreview(data.avatarUrl || null);
       } catch (err) {
         console.error("Error fetching user:", err);
       } finally {
@@ -56,6 +60,14 @@ export default function EditProfile() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatar(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -65,18 +77,23 @@ export default function EditProfile() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      // só envia password se preenchido
-      const payload = {
-        name: form.name,
-        email: form.email,
-        ...(form.password ? { password: form.password } : {}),
-        ...(user.role === "company" ? { companyName: form.companyName } : {}),
-      };
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      if (form.password) formData.append("password", form.password);
+      if (user.role === "company")
+        formData.append("companyName", form.companyName);
+      if (avatar) formData.append("avatar", avatar);
 
       await axios.put(
         `${import.meta.env.VITE_API_URL}/api/users/${user.id}`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       navigate("/profile");
@@ -94,6 +111,21 @@ export default function EditProfile() {
       <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-col items-center">
+          {preview ? (
+            <img
+              src={preview}
+              alt="Avatar preview"
+              className="w-24 h-24 rounded-full object-cover mb-2"
+            />
+          ) : (
+            <div className="w-24 h-24 bg-gray-200 rounded-full mb-2 flex items-center justify-center">
+              <span className="text-gray-500">No photo</span>
+            </div>
+          )}
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+        </div>
+
         <div>
           <label className="block font-medium">Name</label>
           <input
