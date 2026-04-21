@@ -1,0 +1,1 @@
+Fix AppRoutes by moving /edit-profile route inside <Routes> component to fix routing error. Move lines 57-64 inside the Routes closing tag on line 56.
